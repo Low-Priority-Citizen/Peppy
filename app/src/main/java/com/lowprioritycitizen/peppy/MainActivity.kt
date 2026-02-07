@@ -13,6 +13,7 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import android.app.usage.UsageStatsManager
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.delay
 import kotlin.collections.arrayListOf
 
 
@@ -48,7 +50,7 @@ class MainActivity : ComponentActivity() {
             }
 
             if (hasAccess) {
-                Text("Usage Access is granted ✅")
+                Text("Usage Access is granted ✅\n")
                 Blacklist(arrayOf("Peppy","Instagram"))
 
             } else {
@@ -66,13 +68,22 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+
+            LaunchedEffect(Unit) {
+                while (true) {
+                    val pkg = getForegroundApp(this@MainActivity)
+                    Log.d("Peppy", "Foreground app: $pkg")
+                    delay(1000)
+                }
+            }
+
         }
 
     }
 
     private fun hasUsageAccess(context: Context): Boolean {
         val usageStatsManager =
-            context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+            context.getSystemService(USAGE_STATS_SERVICE) as UsageStatsManager
 
         val end = System.currentTimeMillis()
         val start = end - 1000 * 60   // last minute
@@ -83,6 +94,22 @@ class MainActivity : ComponentActivity() {
             end
         )
         return !stats.isNullOrEmpty()
+    }
+
+    private fun getForegroundApp(context: Context): String? {
+        val usageStatsManager =
+            context.getSystemService(USAGE_STATS_SERVICE) as UsageStatsManager
+
+        val end = System.currentTimeMillis()
+        val start = end - 1000 * 60  // last minute
+
+        val stats = usageStatsManager.queryUsageStats(
+            UsageStatsManager.INTERVAL_DAILY,
+            start,
+            end
+        ) ?: return null
+
+        return stats.maxByOrNull { it.lastTimeUsed }?.packageName
     }
 }
 
