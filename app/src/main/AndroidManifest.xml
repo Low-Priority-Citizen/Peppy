@@ -8,6 +8,14 @@
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
 
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -17,6 +25,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Peppy">
+
+        <service
+            android:name=".monitoring.ForegroundMonitoringService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+
+        <activity
+            android:name=".ui.blocker.BlockerActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Peppy" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
