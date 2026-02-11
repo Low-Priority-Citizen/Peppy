@@ -8,7 +8,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.lowprioritycitizen.peppy.ui.theme.PeppyTheme
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
@@ -23,6 +22,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import com.lowprioritycitizen.peppy.monitoring.ForegroundMonitoringService
+import com.lowprioritycitizen.peppy.ui.theme.PeppyTheme
 import kotlinx.coroutines.delay
 import kotlin.collections.arrayListOf
 
@@ -50,9 +51,24 @@ class MainActivity : ComponentActivity() {
             }
 
             if (hasAccess) {
-                Text("Usage Access is granted ✅\n")
-                Blacklist(arrayOf("Peppy","Instagram"))
+                Column {
+                    Text("Usage Access is granted ✅\n")
+                    Blacklist(arrayOf("Peppy","Instagram"))
+                    // when permission granted:
+                    Button(onClick = {
+                        val svc = Intent(this@MainActivity, ForegroundMonitoringService::class.java)
+                        startService(svc) // starts foreground service; user will see notification
+                    }) {
+                        Text("Start monitoring")
+                    }
 
+                    Button(onClick = {
+                        val svc = Intent(this@MainActivity, ForegroundMonitoringService::class.java)
+                        stopService(svc)
+                    }) {
+                        Text("Stop monitoring")
+                    }
+                }
             } else {
                 Column {
                     Text(
@@ -60,7 +76,6 @@ class MainActivity : ComponentActivity() {
                                 "Please enable it in , and while you're there, have a look at apps" +
                                 " that didn't ask for permission👀."
                     )
-
                     Button(onClick = {
                         startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
                     }) {
@@ -76,9 +91,7 @@ class MainActivity : ComponentActivity() {
                     delay(1000)
                 }
             }
-
         }
-
     }
 
     private fun hasUsageAccess(context: Context): Boolean {
