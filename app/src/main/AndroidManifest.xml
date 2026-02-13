@@ -31,7 +31,6 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
-
         <activity
             android:name=".ui.blocker.BlockerActivity"
             android:exported="true"
@@ -43,7 +42,6 @@
             android:theme="@style/Theme.Peppy">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
